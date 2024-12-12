@@ -1,27 +1,46 @@
-import toml
+import re
 from typing import Any, Dict
 
-def parse_toml(input_text: str) -> Dict[str, Any]:
+def parse_toml_with_comments(input_text: str) -> Dict[str, Any]:
     """
-    Парсит строку в формате TOML и возвращает Python-структуру (словарь).
-    В случае ошибки синтаксиса генерирует исключение.
+    Custom TOML parser to capture comments along with values.
     """
-    try:
-        return toml.loads(input_text)
-    except toml.TomlDecodeError as e:
-        raise ValueError(f"Ошибка синтаксиса в TOML: {e}")
+    lines = input_text.splitlines()
+    parsed_data = {}
+    current_section = None
+    constants = {}
 
+    for line in lines:
+        # Skip empty lines
+        line = line.strip()
+        if not line:
+            continue
+        
+        # Handle section headers
+        section_match = re.match(r'^\[([^\]]+)\]$', line)
+        if section_match:
+            current_section = section_match.group(1).strip()
+            parsed_data[current_section] = []
+            continue
 
-def resolve_constants(data: Dict[str, Any], constants: Dict[str, str]) -> Dict[str, Any]:
-    """
-    Рекурсивно заменяет ссылки на константы в структуре данных.
-    """
-    if isinstance(data, dict):
-        return {k: resolve_constants(v, constants) for k, v in data.items()}
-    elif isinstance(data, list):
-        return [resolve_constants(item, constants) for item in data]
-    elif isinstance(data, str):
-        for const_name, const_value in constants.items():
-            data = data.replace(f"${const_name}$", const_value)
-        return data
-    return data
+        # Handle key-value pairs
+        key_value_match = re.match(r'([^#=]+)\s*=\s*(.*?)(\s*#\s*(.*))?$', line)
+        if key_value_match:
+            key = key_value_match.group(1).strip()
+            value = key_value_match.group(2).strip()
+
+            comment = key_value_match.group(4)  # Comment part after `#`
+
+            # Detect if it's a constant (to be replaced later)
+            if '$' in value:
+                constants[key] = value.strip('"')
+            
+            parsed_data[current_section].append({
+                'key': key,
+                'value': value,
+                'comment': comment.strip() if comment else None
+            })
+        else:
+            continue  # Skip lines that do not match the expected pattern
+    
+    return parsed_data, constants

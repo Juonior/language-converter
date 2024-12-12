@@ -1,7 +1,9 @@
 [constants]
-BASE_URL = "https://example.com"
-API_KEY = "abc123"
+app_name = "MyApp" # Имя приложения
+version = "1.0.0" # Версия приложения
 [settings]
-api_endpoint = "$BASE_URL$/api/v1"
-authentication_key = "$API_KEY$"
-timeout = 30
+# Основные настройки
+theme = "dark" # Тема оформления
+timeout = 30 # Таймаут в секундах
+description = "$app_name v$version" # Использование констант
+gg = [1,2,3,4]

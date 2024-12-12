@@ -1,20 +1,29 @@
-# Константы и вычисления для учебного конфигурационного языка
+from typing import Any, Dict
 
-# Пример хранения значений констант
 constants = {}
 
 def declare_constant(name: str, value: str) -> None:
     """
-    Объявляет константу на этапе трансляции.
+    Declare a constant during the translation stage.
     """
     constants[name] = value
 
-def calculate_constant(expression: str) -> str:
+def resolve_constants(data: Any, constants: Dict[str, str]) -> Any:
     """
-    Вычисляет значение константы, если она была ранее объявлена.
-    Использует символ $имя$ для подстановки значений.
+    Recursively replace references to constants in a data structure.
     """
-    # Заменяем все вхождения $имя$ на фактическое значение из constants
-    for name, value in constants.items():
-        expression = expression.replace(f"${name}$", value)
-    return expression
+    if isinstance(data, dict):
+        return {k: resolve_constants(v, constants) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [resolve_constants(item, constants) for item in data]
+    elif isinstance(data, str):
+        return resolve_constants_in_string(data)
+    return data
+
+def resolve_constants_in_string(value: str) -> str:
+    """
+    Replaces all constants in a string (e.g., $app_name$) with their values from the constants dictionary.
+    """
+    for const_name, const_value in constants.items():
+        value = value.replace(f"${{{const_name}}}", const_value)
+    return value

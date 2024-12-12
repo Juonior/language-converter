@@ -1,37 +1,42 @@
 import argparse
-from parser import parse_toml, resolve_constants
-from converter import convert_to_custom_format
+from parser import parse_toml_with_comments
+from converter import convert_to_custom_format_with_comments
+from constants import resolve_constants, declare_constant
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Конвертер TOML в учебный конфигурационный язык")
-    parser.add_argument('output_file', type=str, help="Путь к выходному файлу")
+def main():
+    parser = argparse.ArgumentParser(description="Convert TOML to a custom configuration language")
+    parser.add_argument('output_file', type=str, help="Path to the output file")
     args = parser.parse_args()
 
-    print("Введите данные TOML (пустая строка завершает ввод):")
+    print("Enter TOML data (empty line to finish input):")
     input_text = ""
     while True:
         line = input()
         if line == "":
             break
         input_text += line + "\n"
-    
+
     try:
-        # Парсинг TOML
-        toml_data = parse_toml(input_text)
+        # Parse TOML with comments
+        toml_data, constants = parse_toml_with_comments(input_text)
 
-        # Выделение констант
-        constants = toml_data.pop("constants", {})
-        
-        # Замена констант в данных
+        # Declare constants
+        for name, value in constants.items():
+            declare_constant(name, value)
+
+        # Resolve constants in the data
         resolved_data = resolve_constants(toml_data, constants)
-        
-        # Преобразование в кастомный формат
-        converted_data = convert_to_custom_format(resolved_data)
 
-        # Запись результата в файл
-        with open(args.output_file, 'w') as f:
+        # Convert to custom format with comments
+        converted_data = convert_to_custom_format_with_comments(resolved_data)
+
+        # Write the result to the output file
+        with open(args.output_file, 'w', encoding='utf-8') as f:
             f.write(converted_data)
-        print(f"Конфигурация успешно преобразована и записана в {args.output_file}")
-    
+        
+        print(f"Configuration successfully converted and written to {args.output_file}")
     except ValueError as e:
-        print(f"Ошибка: {e}")
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
