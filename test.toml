@@ -1,0 +1,7 @@
+[constants]
+BASE_URL = "https://example.com"
+API_KEY = "abc123"
+[settings]
+api_endpoint = "$BASE_URL$/api/v1"
+authentication_key = "$API_KEY$"
+timeout = 30
