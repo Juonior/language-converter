@@ -33,7 +33,7 @@ def resolve_constants_in_string(value: str, constants: Dict[str, str]) -> str:
     """
     # Loop through all constants and replace occurrences in the string
     for const_name, const_value in constants.items():
-        value = value.replace(f"${const_name}", const_value)
+        value = value.replace(f"${const_name}$", const_value)
     return value
 
 def convert_to_custom_format_with_comments(toml_data: Dict[str, Any]) -> str:

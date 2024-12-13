@@ -51,15 +51,19 @@
 2. Введите данные TOML в консоль. Завершите ввод пустой строкой.  
 3. Результат будет сохранен в указанном файле.
 
-Пример входных данных TOML:  
+1-ый Пример входных данных TOML:  
 ```toml
 [constants]
-app_name = "MyApp"
-version = "1.0"
+app_name = "MyApp" # Имя приложения
+version = "1.0.0" # Версия приложения
 
 [settings]
-app_name = "$app_name" # Имя приложения
-version = "$version" # Версия приложения
+# Основные настройки
+theme = "dark" # Тема оформления
+timeout = 30 # Таймаут в секундах
+description = "$app_name$ v$version$" # Использование констант
+gg = [1,2,3,4]
+
 ```
 
 Пример результата в пользовательском формате:  
@@ -72,6 +76,36 @@ constants = dict(
 settings = dict(
     app_name = MyApp : Имя приложения,
     version = 1.0 : Версия приложения
+)
+```
+
+2-ой Пример входных данных TOML:  
+```toml
+[constants]
+name = "Daniil"
+surname = "Titov"
+city="Moscow
+
+[Person]
+person_age = 18
+person_name = "$name$"
+person_surname = "$surname$"
+
+[Adress]
+living_in= "Russia"
+city_contry="$city$"
+```
+
+Пример результата в пользовательском формате:  
+```plaintext
+Person = dict(
+    person_age = 18
+    person_name = "Daniil"
+    person_surname = "Titov"
+)
+Adress = dict(
+    living_in = "Russia"
+    city_contry = "Moscow"
 )
 ```
 
